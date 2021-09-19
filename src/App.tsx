@@ -1,26 +1,39 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React, { useState } from 'react';
+import fetchColors from './api/fetchColors';
+import { Colours } from './api/types';
+import Select from './components/Select';
+import { SelectOption } from './components/Select/types';
 
-function App() {
+export default function App() {
+  const [selected, setSelected] = useState(null as SelectOption);
+  const [colors, setColors] = useState([] as Colours);
+
+  const onSelectChange = (value: SelectOption) => {
+    setSelected(value);
+  }
+
+  const loadColors = async (query: string) => {
+    try {
+      console.log(query);
+      const data = await fetchColors(query);
+      console.log(data);
+      setColors(data);
+    } catch (err) {
+      console.error(err);
+    }
+  }
+
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <Select
+        options={colors}
+        searchable
+        placeholder="Select..."
+        onChange={onSelectChange}
+        loadOptionsFn={loadColors}
+      />
+      <hr/>
+      {selected ? `Выбрано: ${selected.text}` : 'Ничего не выбрано...'}
     </div>
   );
 }
-
-export default App;
